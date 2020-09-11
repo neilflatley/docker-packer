@@ -1,0 +1,48 @@
+{
+  "builders": [
+    {
+      "type": "docker",
+      "image": "ubuntu:20.04",
+      "commit": "true",
+      "pull": "true",
+      "changes": ["EXPOSE 80", "ENTRYPOINT nginx -g 'daemon off;'"]
+    }
+  ],
+  "provisioners": [
+    {
+      "inline": ["echo 'Packer Template Build -- Complete'"],
+      "type": "shell"
+    },
+    {
+      "type": "shell",
+      "script": "./scripts/install-ansible.sh"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "./ansible/common.yml"
+    },
+    {
+      "type": "shell",
+      "inline": ["mkdir /usr/src/app"]
+    },
+    {
+      "destination": "/usr/src/app/html",
+      "source": "./nginx/html",
+      "type": "file"
+    },
+    {
+      "destination": "/etc/nginx/nginx.conf",
+      "source": "./nginx/conf/default.conf",
+      "type": "file"
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "docker-tag",
+        "repository": "neilflatley/ubuntunginx",
+        "tag": "latest"
+      }
+    ]
+  ]
+}

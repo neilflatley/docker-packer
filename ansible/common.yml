@@ -1,0 +1,11 @@
+- hosts: localhost
+  tasks:
+    - name: install nginx
+      apt:
+        name: nginx
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+    # - name: copy html files
+    #   copy:
+    #     src: /tmp/html/
+    #     dest: /usr/share/nginx/html/

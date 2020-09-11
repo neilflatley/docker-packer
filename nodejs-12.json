@@ -1,0 +1,38 @@
+{
+  "builders": [
+    {
+      "name": "nodengnix",
+      "type": "docker",
+      "image": "node:12",
+      "commit": "true",
+      "pull": "true",
+      "changes": ["ENTRYPOINT nginx -g 'daemon off;'"]
+    }
+  ],
+  "provisioners": [
+    {
+      "inline": ["echo 'Packer Template Build -- Complete'"],
+      "type": "shell"
+    },
+    {
+      "type": "shell",
+      "script": "./scripts/install-ansible.sh"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "./ansible/common.yml"
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "docker-tag",
+        "repository": "neilflatley/nodengnix",
+        "tag": "latest"
+      },
+      {
+        "type": "docker-push"
+      }
+    ]
+  ]
+}
